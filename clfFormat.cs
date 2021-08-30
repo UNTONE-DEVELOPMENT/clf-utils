@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace clf
@@ -65,6 +66,16 @@ namespace clf
 
     public static class clfUtils
     {
+        public static clfFile loadClfFromFile(string path)
+        {
+            return loadClfFromString(File.ReadAllLines(path));
+        }
+
+        public static clfFile convertClf1(string clf)
+        {
+            return null;
+        }
+
         public static clfFile newClfFile()
         {
             clfFile file = new clfFile();
@@ -107,7 +118,7 @@ namespace clf
                     file.blocks.blockList.Add(blk);
                 }
 
-                return null;
+                return file;
             }
             else
             {
