@@ -78,6 +78,10 @@ namespace clf
 
         public static clfFile convertLegacy(string[] clf)
         {
+            Debug.Log("starting conversion...");
+
+            var watch = new System.Diagnostics.Stopwatch();
+
             string[] meta = getSection("META", clf);
             clfFile file = newClfFile();
 
@@ -96,7 +100,8 @@ namespace clf
 
             file.general.description = "Converted from CLF 1.0";
 
-            string[] blocks = getSection("Blocks", clf);
+            string[] blocks = getSection("LEVEL", clf);
+            Debug.Log(blocks);
             foreach (string blockobj in blocks)
             {
                 // BLOCKID:DATAID,XPOS,YPOS,ZPOS,XSCALE,YSCALE,ROTATION,RED,GREEN,BLUE,ALPHA...
@@ -106,13 +111,7 @@ namespace clf
                 int block_id;
                 int data_id;
 
-                if(split[4] == "1")
-                {
-                    block_id = 0;
-                    data_id = 0;
-                }
-
-                switch (split[4]) 
+                switch (split[3]) 
                 {
                     case "1":
                         block_id = 0;
@@ -225,6 +224,10 @@ namespace clf
                 //objects.block blk = parseBlockString(split);
                 file.blocks.blockList.Add(blk);
             }
+
+            Debug.Log("Conversion Finished");
+
+            Debug.Log("Converted : Execution Time: " + watch.ElapsedMilliseconds + " ms");
 
             return file;
         }
