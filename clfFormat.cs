@@ -71,9 +71,171 @@ namespace clf
             return loadClfFromString(File.ReadAllLines(path));
         }
 
-        public static clfFile convertClf1(string clf)
+        public static clfFile convertAndLoadClf1FromFile(string path)
         {
-            return null;
+            return convertClf1(File.ReadAllLines(path));
+        }
+
+        public static clfFile convertClf1(string[] clf)
+        {
+            string[] meta = getSection("META", clf);
+            clfFile file = newClfFile();
+
+            foreach (string x in meta)
+            {
+                string[] line = readClfLegacyLine(x);
+                if (line[0] == "name")
+                {
+                    file.general.name = line[1];
+                }
+                if (line[0] == "creator")
+                {
+                    file.general.creator = line[1];
+                }
+            }
+
+            file.general.description = "Converted from CLF 1.0";
+
+            string[] blocks = getSection("Blocks", clf);
+            foreach (string blockobj in blocks)
+            {
+                // BLOCKID:DATAID,XPOS,YPOS,ZPOS,XSCALE,YSCALE,ROTATION,RED,GREEN,BLUE,ALPHA...
+
+                string[] split = blockobj.Split(',');
+
+                int block_id;
+                int data_id;
+
+                if(split[4] == "1")
+                {
+                    block_id = 0;
+                    data_id = 0;
+                }
+
+                switch (split[4]) 
+                {
+                    case "1":
+                        block_id = 0;
+                        data_id = 0;
+                        break;
+                    case "2":
+                        block_id = 1;
+                        data_id = 0;
+                        break;
+                    case "3":
+                        block_id = 2;
+                        data_id = 0;
+                        break;
+                    case "4":
+                        block_id = 3;
+                        data_id = 0;
+                        break;
+                    case "5":
+                        block_id = 4;
+                        data_id = 0;
+                        break;
+                    case "6":
+                        block_id = 4;
+                        data_id = 1;
+                        break;
+                    case "7":
+                        block_id = 16;
+                        data_id = 0;
+                        break;
+                    case "8":
+                        block_id = 5;
+                        data_id = 0;
+                        break;
+                    case "16":
+                        block_id = 6;
+                        data_id = 0;
+                        break;
+                    case "17":
+                        block_id = 7;
+                        data_id = 0;
+                        break;
+                    case "18":
+                        block_id = 5;
+                        data_id = 1;
+                        break;
+                    case "19":
+                        block_id = 8;
+                        data_id = 0;
+                        break;
+                    case "20":
+                        block_id = 0;
+                        data_id = 0;
+                        break;
+                    case "21":
+                        block_id = 9;
+                        data_id = 0;
+                        break;
+                    case "22":
+                        block_id = 10;
+                        data_id = 0;
+                        break;
+                    case "23":
+                        block_id = 11;
+                        data_id = 0;
+                        break;
+                    case "24":
+                        block_id = 12;
+                        data_id = 0;
+                        break;
+                    case "25":
+                        block_id = 11;
+                        data_id = 1;
+                        break;
+                    case "26":
+                        block_id = 12;
+                        data_id = 1;
+                        break;
+                    case "27":
+                        block_id = 11;
+                        data_id = 2;
+                        break;
+                    case "28":
+                        block_id = 12;
+                        data_id = 2;
+                        break;
+                    case "29":
+                        block_id = 13;
+                        data_id = 0;
+                        break;
+                    case "33":
+                        block_id = 17;
+                        data_id = 0;
+                        break;
+                    case "34":
+                        block_id = 14;
+                        data_id = 0;
+                        break;
+                    case "35":
+                        block_id = 15;
+                        data_id = 0;
+                        break;
+                    default:
+                        block_id = 0;
+                        data_id = 0;
+                        break;
+                }
+
+                objects.block blk = new objects.block(block_id, data_id,
+                    new Vector3(float.Parse(split[0]), float.Parse(split[1]), 10f), new Vector2(1, 1), 0, new Color32(255, 255, 255, 255));
+                //objects.block blk = parseBlockString(split);
+                file.blocks.blockList.Add(blk);
+            }
+
+            return file;
+        }
+
+        public static string[] readClfLegacyLine(string line)
+        {
+            line = line.Replace(": ", "%");
+            line = line.Replace("'", "");
+            char split = '%';
+            string[] splitted = line.Split(split);
+            return splitted;
         }
 
         public static clfFile newClfFile()
