@@ -66,9 +66,26 @@ namespace clf
 
     public static class clfUtils
     {
+        public static clfFile loadDynamic(string[] clf)
+        {
+            if(clf[0] == "CLF 0.3")
+            {
+                return convertLegacy(clf);
+            }
+            else
+            {
+                return loadClfFromString(clf);
+            }
+        }
+
         public static clfFile loadClfFromFile(string path)
         {
             return loadClfFromString(File.ReadAllLines(path));
+        }
+
+        public static clfFile loadDynamicFromPath(string path)
+        {
+            return loadDynamic(File.ReadAllLines(path));
         }
 
         public static clfFile convertLegacyFromFile(string path)
@@ -220,7 +237,7 @@ namespace clf
                 }
 
                 objects.block blk = new objects.block(block_id, data_id,
-                    new Vector3(float.Parse(split[0]), float.Parse(split[1]), 10f), new Vector2(1, 1), 0, new Color32(255, 255, 255, 255));
+                    new Vector3(float.Parse(split[0]), -float.Parse(split[1]), 0f), new Vector2(1, 1), 0, new Color32(255, 255, 255, 255));
                 //objects.block blk = parseBlockString(split);
                 file.blocks.blockList.Add(blk);
             }
