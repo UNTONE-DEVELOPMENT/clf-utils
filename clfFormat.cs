@@ -103,34 +103,7 @@ namespace clf
                     // BLOCKID:DATAID,XPOS,YPOS,ZPOS,XSCALE,YSCALE,ROTATION,RED,GREEN,BLUE,ALPHA...
 
                     string[] split = blockobj.Split(',');
-                    int block_id;
-                    int data_id;
-                    Vector3 position;
-                    Vector2 scale;
-                    float rotation;
-                    Color32 colour;
-
-                    block_id = int.Parse(split[0].Split(':')[0]);
-                    data_id = int.Parse(split[0].Split(':')[1]);
-
-                    position = new Vector3(float.Parse(split[1]), float.Parse(split[2]), float.Parse(split[3]));
-                    scale = new Vector2(float.Parse(split[4]), float.Parse(split[5]));
-                    rotation = float.Parse(split[6]);
-
-                    byte a = 255;
-
-                    try
-                    {
-                        a = (byte)float.Parse(split[7]);
-                    }
-                    catch
-                    {
-                        
-                    }
-
-                    colour = new Color32((byte)float.Parse(split[7]), (byte)float.Parse(split[8]), (byte)float.Parse(split[9]), a);
-
-                    objects.block blk = new objects.block(block_id, data_id, position, scale, rotation, colour);
+                    objects.block blk = parseBlockString(split);
                     file.blocks.blockList.Add(blk);
                 }
 
@@ -141,6 +114,40 @@ namespace clf
                 Debug.LogError("[CLF UTILS] <loadClfFromString> Requested string is not CLF 2.x! You should use clfUtils.convertLegacy() instead.");
                 return null;
             }
+        }
+
+        public static objects.block parseBlockString(string[] split)
+        {
+            int block_id;
+            int data_id;
+            Vector3 position;
+            Vector2 scale;
+            float rotation;
+            Color32 colour;
+
+            block_id = int.Parse(split[0].Split(':')[0]);
+            data_id = int.Parse(split[0].Split(':')[1]);
+
+            position = new Vector3(float.Parse(split[1]), float.Parse(split[2]), float.Parse(split[3]));
+            scale = new Vector2(float.Parse(split[4]), float.Parse(split[5]));
+            rotation = float.Parse(split[6]);
+
+            byte a = 255;
+
+            try
+            {
+                a = (byte)float.Parse(split[7]);
+            }
+            catch
+            {
+
+            }
+
+            colour = new Color32((byte)float.Parse(split[7]), (byte)float.Parse(split[8]), (byte)float.Parse(split[9]), a);
+
+            objects.block blk = new objects.block(block_id, data_id, position, scale, rotation, colour);
+
+            return blk;
         }
 
         public static string[] readClfLine(string line)
