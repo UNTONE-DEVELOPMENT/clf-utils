@@ -69,6 +69,9 @@ namespace clf
         {
             if(data[0].StartsWith("CLF 2"))
             {
+                string[] general = getSection("General", data); // gives us all the lines for this section
+
+
                 return null;
             }
             else
@@ -76,6 +79,29 @@ namespace clf
                 Debug.LogError("[CLF UTILS] <loadClfFromString> Requested string is not CLF 2.x! You should use clfUtils.convertLegacy() instead.");
                 return null;
             }
+        }
+
+        public static string[] getSection(string sectionName, string[] data)
+        {
+            List<string> section = new List<string>();
+            bool readingSection = false;
+            foreach (string x in data)
+            {
+                if (x == "[" + sectionName + "]")
+                {
+                    readingSection = true;
+                }
+                else if (x.StartsWith("]") && x.EndsWith("]"))
+                {
+                    // we're now about to go into another section. we gotta stop reading
+                    readingSection = false;
+                }
+                if (x != "" && readingSection == true && !x.StartsWith("#"))
+                {
+                    section.Add(x);
+                }
+            }
+            return section.ToArray();
         }
     }
 }
