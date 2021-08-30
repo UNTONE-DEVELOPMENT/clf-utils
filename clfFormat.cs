@@ -71,12 +71,12 @@ namespace clf
             return loadClfFromString(File.ReadAllLines(path));
         }
 
-        public static clfFile convertAndLoadClf1FromFile(string path)
+        public static clfFile convertLegacyFromFile(string path)
         {
-            return convertClf1(File.ReadAllLines(path));
+            return convertLegacy(File.ReadAllLines(path));
         }
 
-        public static clfFile convertClf1(string[] clf)
+        public static clfFile convertLegacy(string[] clf)
         {
             string[] meta = getSection("META", clf);
             clfFile file = newClfFile();
@@ -316,6 +316,8 @@ namespace clf
 
             }
 
+            split[9] = split[9].Replace(";", "");
+
             colour = new Color32((byte)float.Parse(split[7]), (byte)float.Parse(split[8]), (byte)float.Parse(split[9]), a);
 
             objects.block blk = new objects.block(block_id, data_id, position, scale, rotation, colour);
@@ -346,7 +348,7 @@ namespace clf
                     // we're now about to go into another section. we gotta stop reading
                     readingSection = false;
                 }
-                if (x != "" && readingSection == true && !x.StartsWith("#"))
+                if (x != "" && readingSection == true && !x.StartsWith("#") && x != "[" + sectionName + "]")
                 {
                     section.Add(x);
                 }
