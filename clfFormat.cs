@@ -375,5 +375,47 @@ namespace clf
             }
             return section.ToArray();
         }
+
+        public static string saveClfFile(string path, segments.general general, segments.blocks blocks)
+        {
+            return baseSave(general, blocks);
+        }
+
+        public static string saveClfFile(string path, clfFile file)
+        {
+            return baseSave(file.general, file.blocks);
+        }
+
+        public static string baseSave(segments.general general, segments.blocks blocks)
+        {
+            // BLOCKID:DATAID,XPOS,YPOS,ZPOS,XSCALE,YSCALE,ROTATION,RED,GREEN,BLUE,ALPHA...
+
+            string clf = @"CLF 2.0
+
+
+[General]
+name = " + general.name + @"
+description = " + general.description + @"
+creator = " + general.creator + @"
+
+
+[Blocks]
+";
+
+            foreach (objects.block blk in blocks.blockList)
+            {
+                // this is shit
+
+                clf += blk.block_id + ":" + blk.data_id + ","
+                    + blk.position.x + "," + blk.position.y + "," + blk.position.z + ","
+                    + blk.scale.x + "," + blk.scale.y + ","
+                    + blk.rotation + "," +
+                    blk.colour.r + "," +
+                    blk.colour.g + "," +
+                    blk.colour.b + "," + blk.colour.a + ";\n";
+            }
+
+            return clf;
+        }
     }
 }
