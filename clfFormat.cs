@@ -376,12 +376,12 @@ namespace clf
             return section.ToArray();
         }
 
-        public static string saveClfFile(string path, segments.general general, segments.blocks blocks)
+        public static string saveClfFile(segments.general general, segments.blocks blocks)
         {
             return baseSave(general, blocks);
         }
 
-        public static string saveClfFile(string path, clfFile file)
+        public static string saveClfFile(clfFile file)
         {
             return baseSave(file.general, file.blocks);
         }
