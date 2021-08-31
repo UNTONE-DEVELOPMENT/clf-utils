@@ -381,6 +381,11 @@ namespace clf
             return baseSave(general, blocks);
         }
 
+        public static string saveClfFile(string name, string description, string creator, List<objects.block> blockList)
+        {
+            return baseSave(new segments.general(name, description, creator), new segments.blocks(blockList));
+        }
+
         public static string saveClfFile(clfFile file)
         {
             return baseSave(file.general, file.blocks);
