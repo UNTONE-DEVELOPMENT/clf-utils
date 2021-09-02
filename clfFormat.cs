@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -22,20 +23,15 @@ namespace clf
         }
 
         // BLOCKID,XPOS,YPOS,ZPOS,XSCALE,YSCALE,ROTATION,RED,GREEN,BLUE...
-        public class blocks
+        public struct blocks
         {
-            public List<objects.block> blockList;
-
-            public blocks(List<objects.block> blockList)
-            {
-                this.blockList = blockList;
-            }
+            public objects.block[] blockList;
         }
     }
 
     public class objects
     {
-        public class block
+        public struct block
         {
             public int block_id;
             public int data_id;
@@ -43,17 +39,26 @@ namespace clf
             public Vector2 scale;
             public float rotation;
             public Color32 colour;
-
-            public block(int block_id , int data_id, Vector3 position , Vector2 scale, float rotation , Color32 colour)
-            {
-                this.block_id = block_id;
-                this.data_id = data_id;
-                this.position = position;
-                this.scale = scale;
-                this.rotation = rotation;
-                this.colour = colour;
-            }
         }
+        // public class block
+        // {
+        //     public int block_id;
+        //     public int data_id;
+        //     public Vector3 position;
+        //     public Vector2 scale;
+        //     public float rotation;
+        //     public Color32 colour;
+        // 
+        //     public block(int block_id , int data_id, Vector3 position , Vector2 scale, float rotation , Color32 colour)
+        //     {
+        //         this.block_id = block_id;
+        //         this.data_id = data_id;
+        //         this.position = position;
+        //         this.scale = scale;
+        //         this.rotation = rotation;
+        //         this.colour = colour;
+        //     }
+        // }
     }
 
     public class clfFile
@@ -236,10 +241,11 @@ namespace clf
                         break;
                 }
 
-                objects.block blk = new objects.block(block_id, data_id,
-                    new Vector3(float.Parse(split[0]), -float.Parse(split[1]), 0f), new Vector2(1, 1), 0, new Color32(255, 255, 255, 255));
-                //objects.block blk = parseBlockString(split);
-                file.blocks.blockList.Add(blk);
+                //objects.block blk = new objects.block(block_id, data_id,
+                //    new Vector3(float.Parse(split[0]), -float.Parse(split[1]), 0f), new Vector2(1, 1), 0, new Color32(255, 255, 255, 255));
+                ////objects.block blk = parseBlockString(split);
+                //file.blocks.blockList.Add(blk);
+                Debug.LogError("Legacy loading currnetly disabled.");
             }
 
             Debug.Log("Conversion Finished");
@@ -262,11 +268,10 @@ namespace clf
         {
             clfFile file = new clfFile();
             file.general = new segments.general("unknown", "unknown", "unknown");
-            file.blocks = new segments.blocks(new List<objects.block>());
             return file;
         }
 
-        public static clfFile loadClfFromString(string[] data)
+        public unsafe static clfFile loadClfFromString(string[] data)
         {
             clfFile file = newClfFile();
 
@@ -291,14 +296,36 @@ namespace clf
                 }
 
                 string[] blocks = getSection("Blocks", data);
-                foreach(string blockobj in blocks)
+
+                file.blocks = new segments.blocks();
+                file.blocks.blockList = new objects.block[blocks.Length];
+
+                for (int i = 0; i < blocks.Length; i++)
                 {
                     // BLOCKID:DATAID,XPOS,YPOS,ZPOS,XSCALE,YSCALE,ROTATION,RED,GREEN,BLUE,ALPHA...
 
-                    string[] split = blockobj.Split(',');
-                    objects.block blk = parseBlockString(split);
-                    file.blocks.blockList.Add(blk);
+                    string[] split = blocks[i].Split(',');
+
+                    file.blocks.blockList[i].block_id = int.Parse(split[0].Split(':')[0]);
+                    file.blocks.blockList[i].data_id = int.Parse(split[0].Split(':')[1]);
+                    
+                    file.blocks.blockList[i].position = new Vector3(float.Parse(split[1]), float.Parse(split[2]), float.Parse(split[3]));
+                    file.blocks.blockList[i].scale = new Vector2(float.Parse(split[4]), float.Parse(split[5]));
+                    file.blocks.blockList[i].rotation = float.Parse(split[6]);
+                    
+                    byte a = 255;
+                    
+                    if (split[7] != null)
+                    {
+                        a = (byte)float.Parse(split[7]);
+                    }
+                    
+                    split[9] = split[9].Replace(";", "");
+
+                    file.blocks.blockList[i].colour = new Color32((byte)float.Parse(split[7]), (byte)float.Parse(split[8]), (byte)float.Parse(split[9]), a);
                 }
+
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
 
                 return file;
             }
@@ -307,42 +334,6 @@ namespace clf
                 Debug.LogError("[CLF UTILS] <loadClfFromString> Requested string is not CLF 2.x! You should use clfUtils.convertLegacy() instead.");
                 return null;
             }
-        }
-
-        public static objects.block parseBlockString(string[] split)
-        {
-            int block_id;
-            int data_id;
-            Vector3 position;
-            Vector2 scale;
-            float rotation;
-            Color32 colour;
-
-            block_id = int.Parse(split[0].Split(':')[0]);
-            data_id = int.Parse(split[0].Split(':')[1]);
-
-            position = new Vector3(float.Parse(split[1]), float.Parse(split[2]), float.Parse(split[3]));
-            scale = new Vector2(float.Parse(split[4]), float.Parse(split[5]));
-            rotation = float.Parse(split[6]);
-
-            byte a = 255;
-
-            try
-            {
-                a = (byte)float.Parse(split[7]);
-            }
-            catch
-            {
-
-            }
-
-            split[9] = split[9].Replace(";", "");
-
-            colour = new Color32((byte)float.Parse(split[7]), (byte)float.Parse(split[8]), (byte)float.Parse(split[9]), a);
-
-            objects.block blk = new objects.block(block_id, data_id, position, scale, rotation, colour);
-
-            return blk;
         }
 
         public static string[] readClfLine(string line)
@@ -381,9 +372,9 @@ namespace clf
             return baseSave(general, blocks);
         }
 
-        public static string saveClfFile(string name, string description, string creator, List<objects.block> blockList)
+        public static string saveClfFile(string name, string description, string creator, segments.blocks blockList)
         {
-            return baseSave(new segments.general(name, description, creator), new segments.blocks(blockList));
+            return baseSave(new segments.general(name, description, creator), blockList);
         }
 
         public static string saveClfFile(clfFile file)
