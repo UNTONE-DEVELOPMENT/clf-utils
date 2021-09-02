@@ -124,11 +124,14 @@ namespace clf
 
             string[] blocks = getSection("LEVEL", clf);
             Debug.Log(blocks);
-            foreach (string blockobj in blocks)
+            file.blocks = new segments.blocks();
+            file.blocks.blockList = new objects.block[blocks.Length];
+
+            for (int i = 0; i < blocks.Length; i++)
             {
                 // BLOCKID:DATAID,XPOS,YPOS,ZPOS,XSCALE,YSCALE,ROTATION,RED,GREEN,BLUE,ALPHA...
 
-                string[] split = blockobj.Split(',');
+                string[] split = blocks[i].Split(',');
 
                 int block_id;
                 int data_id;
@@ -241,11 +244,16 @@ namespace clf
                         break;
                 }
 
-                //objects.block blk = new objects.block(block_id, data_id,
-                //    new Vector3(float.Parse(split[0]), -float.Parse(split[1]), 0f), new Vector2(1, 1), 0, new Color32(255, 255, 255, 255));
-                ////objects.block blk = parseBlockString(split);
-                //file.blocks.blockList.Add(blk);
-                Debug.LogError("Legacy loading currnetly disabled.");
+                objects.block blk = new objects.block();
+
+                blk.block_id = block_id;
+                blk.data_id = data_id;
+                blk.position = new Vector3(float.Parse(split[0]), -float.Parse(split[1]), 0f);
+                blk.scale = new Vector2(1, 1);
+                blk.colour = new Color32(255, 255, 255, 255);
+
+                file.blocks.blockList[i] = blk;
+                //Debug.LogError("Legacy loading currnetly disabled.");
             }
 
             Debug.Log("Conversion Finished");
