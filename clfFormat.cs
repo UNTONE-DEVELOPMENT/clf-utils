@@ -271,7 +271,7 @@ namespace clf
             return file;
         }
 
-        public unsafe static clfFile loadClfFromString(string[] data)
+        public static clfFile loadClfFromString(string[] data)
         {
             clfFile file = newClfFile();
 
