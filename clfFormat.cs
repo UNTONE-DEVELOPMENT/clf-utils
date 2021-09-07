@@ -13,12 +13,14 @@ namespace clf
             public string name;
             public string description;
             public string creator;
+            public string tags;
 
-            public general(string name, string description, string creator)
+            public general(string name, string description, string creator, string tags = "")
             {
                 this.name = name;
                 this.description = description;
                 this.creator = creator;
+                this.tags = tags;
             }
         }
 
@@ -26,6 +28,14 @@ namespace clf
         public struct blocks
         {
             public objects.block[] blockList;
+        }
+
+        public struct visual
+        {
+            public string bgType;
+            public Color32 colour1; // used in solid & as first colour in gradient
+            public Color32 colour2; // second colour in gradient
+            public Texture2D sprite;
         }
     }
 
@@ -67,6 +77,7 @@ namespace clf
         public string raw;
         public segments.general general;
         public segments.blocks blocks;
+        public segments.visual visual;
     }
 
     public static class clfUtils
@@ -256,6 +267,10 @@ namespace clf
                 //Debug.LogError("Legacy loading currnetly disabled.");
             }
 
+            file.visual.bgType = "gradient";
+            file.visual.colour1 = new Color32(63, 183, 147, 255);
+            file.visual.colour2 = new Color32(46, 89, 101, 255);
+
             Debug.Log("Conversion Finished");
 
             Debug.Log("Converted : Execution Time: " + watch.ElapsedMilliseconds + " ms");
@@ -301,7 +316,68 @@ namespace clf
                     {
                         file.general.creator = line[1];
                     }
+                    if (line[0] == "tags")
+                    {
+                        file.general.tags = line[1];
+                    }
                 }
+
+                bool visualExists = false;
+                string[] visual = new string[0];
+
+                try
+                {
+                    visual = getSection("Visual", data);
+                    visualExists = true;
+                }
+                catch
+                {
+                    Debug.Log("Visual section does not exist. Creating.");
+                }
+
+                if(visualExists == false || visual.Length < 1)
+                {
+                    file.visual.bgType = "gradient";
+                    file.visual.colour1 = new Color32(63, 183, 147, 255);
+                    Debug.Log(file.visual.colour1.r);
+                    file.visual.colour2 = new Color32(46, 89, 101, 255);
+                }
+                else
+                {
+                    Debug.Log(visual.Length);
+                    foreach(string x in visual)
+                    {
+                        string[] line = readClfLine(x);
+                        if (line[0] == "bgColor")
+                        {
+                            file.visual.bgType = line[1];
+                        }
+                        if (line[0] == "background")
+                        {
+                            if(file.visual.bgType == "solid")
+                            {
+                                string[] split = line[1].Split(',');
+                                file.visual.colour1 = new Color32((byte)float.Parse(split[0]), (byte)float.Parse(split[1]), (byte)float.Parse(split[2]), 255);
+                            }
+                            if(file.visual.bgType == "gradient")
+                            {
+                                string[] split = line[1].Split(';');
+
+                                string[] c1 = split[0].Split(',');
+                                string[] c2 = split[1].Split(',');
+
+                                file.visual.colour1 = new Color32((byte)float.Parse(c1[0]), (byte)float.Parse(c1[1]), (byte)float.Parse(c1[2]), 255);
+                                file.visual.colour2 = new Color32((byte)float.Parse(c2[0]), (byte)float.Parse(c2[1]), (byte)float.Parse(c2[2]), 255);
+                            }
+                            if(file.visual.bgType == "image")
+                            {
+                                file.visual.bgType = "solid";
+                                file.visual.colour1 = new Color32(255, 0, 0, 255);
+                            }
+                        }
+                    }
+                }
+                
 
                 string[] blocks = getSection("Blocks", data);
 
@@ -375,24 +451,38 @@ namespace clf
             return section.ToArray();
         }
 
-        public static string saveClfFile(segments.general general, segments.blocks blocks)
+        public static string saveClfFile(segments.general general, segments.blocks blocks, segments.visual visual)
         {
-            return baseSave(general, blocks);
+            return baseSave(general, blocks, visual);
         }
 
-        public static string saveClfFile(string name, string description, string creator, segments.blocks blockList)
+        public static string saveClfFile(string name, string description, string creator, segments.blocks blockList, segments.visual visual)
         {
-            return baseSave(new segments.general(name, description, creator), blockList);
+            return baseSave(new segments.general(name, description, creator), blockList, visual);
         }
 
         public static string saveClfFile(clfFile file)
         {
-            return baseSave(file.general, file.blocks);
+            return baseSave(file.general, file.blocks, file.visual);
         }
 
-        public static string baseSave(segments.general general, segments.blocks blocks)
+        public static string baseSave(segments.general general, segments.blocks blocks, segments.visual visual)
         {
             // BLOCKID:DATAID,XPOS,YPOS,ZPOS,XSCALE,YSCALE,ROTATION,RED,GREEN,BLUE,ALPHA...
+
+            string backgroundString = "255,255,255;255,255,255";
+            if(visual.bgType == "solid")
+            {
+                backgroundString = visual.colour1.r + "," + visual.colour1.g + "," + visual.colour1.b;
+            }
+            if(visual.bgType == "gradient")
+            {
+                backgroundString = visual.colour1.r + "," + visual.colour1.g + "," + visual.colour1.b + ";" + visual.colour2.r + "," + visual.colour2.g + "," + visual.colour2.b;
+            }
+            if(visual.bgType == "image")
+            {
+                backgroundString = "255,0,0";
+            }
 
             string clf = @"CLF 2.0
 
@@ -401,7 +491,11 @@ namespace clf
 name = " + general.name + @"
 description = " + general.description + @"
 creator = " + general.creator + @"
+tags = " + general.tags + @"
 
+[Visual]
+bgType = " + visual.bgType + @"
+background = " + backgroundString + @"
 
 [Blocks]
 ";
