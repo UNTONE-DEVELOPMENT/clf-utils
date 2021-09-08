@@ -339,25 +339,26 @@ namespace clf
                 {
                     file.visual.bgType = "gradient";
                     file.visual.colour1 = new Color32(63, 183, 147, 255);
-                    Debug.Log(file.visual.colour1.r);
+                    Debug.Log("no visual section. creating");
                     file.visual.colour2 = new Color32(46, 89, 101, 255);
                 }
                 else
                 {
-                    Debug.Log(visual.Length);
+                    Debug.Log("visualesection found! reading.");
                     foreach(string x in visual)
                     {
                         string[] line = readClfLine(x);
-                        if (line[0] == "bgColor")
+                        if (line[0] == "bgType")
                         {
                             file.visual.bgType = line[1];
                         }
                         if (line[0] == "background")
                         {
+                            Debug.Log("found background");
                             if(file.visual.bgType == "solid")
                             {
                                 string[] split = line[1].Split(',');
-                                file.visual.colour1 = new Color32((byte)float.Parse(split[0]), (byte)float.Parse(split[1]), (byte)float.Parse(split[2]), 255);
+                                file.visual.colour1 = new Color32(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), 255);
                             }
                             if(file.visual.bgType == "gradient")
                             {
@@ -366,8 +367,9 @@ namespace clf
                                 string[] c1 = split[0].Split(',');
                                 string[] c2 = split[1].Split(',');
 
-                                file.visual.colour1 = new Color32((byte)float.Parse(c1[0]), (byte)float.Parse(c1[1]), (byte)float.Parse(c1[2]), 255);
-                                file.visual.colour2 = new Color32((byte)float.Parse(c2[0]), (byte)float.Parse(c2[1]), (byte)float.Parse(c2[2]), 255);
+                                file.visual.colour1 = new Color32(byte.Parse(c1[0]), byte.Parse(c1[1]), byte.Parse(c1[2]), 255);
+                                Debug.Log("color 1 : " + file.visual.colour1.ToString());
+                                file.visual.colour2 = new Color32(byte.Parse(c2[0]), byte.Parse(c2[1]), byte.Parse(c2[2]), 255);
                             }
                             if(file.visual.bgType == "image")
                             {
