@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace clf
@@ -82,9 +83,19 @@ namespace clf
 
     public static class clfUtils
     {
+        public static clfFile newFile()
+        {
+            TextAsset textFile = Resources.Load<TextAsset>("default");
+            Debug.Log(textFile);
+            string[] fLines = Regex.Split(textFile.text, "\n|\r|\r\n");
+            Debug.Log(fLines[0]);
+            return loadClfFromString(fLines);
+        }
+
         public static clfFile loadDynamic(string[] clf)
         {
-            if(clf[0].StartsWith("CLF 0.3"))
+            Debug.Log(clf[0]);
+            if(clf[0].StartsWith("CLF 0."))
             {
                 return convertLegacy(clf);
             }
