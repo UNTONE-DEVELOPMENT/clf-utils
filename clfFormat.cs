@@ -84,7 +84,7 @@ namespace clf
     {
         public static clfFile loadDynamic(string[] clf)
         {
-            if(clf[0] == "CLF 0.3")
+            if(clf[0].StartsWith("CLF 0.3"))
             {
                 return convertLegacy(clf);
             }
@@ -134,7 +134,6 @@ namespace clf
             file.general.description = "Converted from CLF 1.0";
 
             string[] blocks = getSection("LEVEL", clf);
-            Debug.Log(blocks);
             file.blocks = new segments.blocks();
             file.blocks.blockList = new objects.block[blocks.Length];
 
@@ -147,105 +146,106 @@ namespace clf
                 int block_id;
                 int data_id;
 
-                switch (split[3]) 
+                switch (int.Parse(split[3])) 
                 {
-                    case "1":
+                    case 0:
                         block_id = 0;
                         data_id = 0;
                         break;
-                    case "2":
+                    case 1:
                         block_id = 1;
                         data_id = 0;
+                        Debug.Log("just got a key at " + split[0] + ":" + split[1]);
                         break;
-                    case "3":
+                    case 2:
                         block_id = 2;
                         data_id = 0;
                         break;
-                    case "4":
+                    case 3:
                         block_id = 3;
                         data_id = 0;
                         break;
-                    case "5":
+                    case 4:
                         block_id = 4;
                         data_id = 0;
                         break;
-                    case "6":
+                    case 5:
                         block_id = 4;
                         data_id = 1;
                         break;
-                    case "7":
+                    case 6:
                         block_id = 16;
                         data_id = 0;
                         break;
-                    case "8":
+                    case 7:
                         block_id = 5;
                         data_id = 0;
                         break;
-                    case "16":
+                    case 16:
                         block_id = 6;
                         data_id = 0;
                         break;
-                    case "17":
+                    case 17:
                         block_id = 7;
                         data_id = 0;
                         break;
-                    case "18":
+                    case 18:
                         block_id = 5;
                         data_id = 1;
                         break;
-                    case "19":
+                    case 19:
                         block_id = 8;
                         data_id = 0;
                         break;
-                    case "20":
+                    case 20:
                         block_id = 0;
                         data_id = 0;
                         break;
-                    case "21":
+                    case 21:
                         block_id = 9;
                         data_id = 0;
                         break;
-                    case "22":
+                    case 22:
                         block_id = 10;
                         data_id = 0;
                         break;
-                    case "23":
+                    case 23:
                         block_id = 11;
                         data_id = 0;
                         break;
-                    case "24":
+                    case 24:
                         block_id = 12;
                         data_id = 0;
                         break;
-                    case "25":
+                    case 25:
                         block_id = 11;
                         data_id = 1;
                         break;
-                    case "26":
+                    case 26:
                         block_id = 12;
                         data_id = 1;
                         break;
-                    case "27":
+                    case 27:
                         block_id = 11;
                         data_id = 2;
                         break;
-                    case "28":
+                    case 28:
                         block_id = 12;
                         data_id = 2;
                         break;
-                    case "29":
+                    case 29:
                         block_id = 13;
                         data_id = 0;
                         break;
-                    case "33":
+                    case 33:
                         block_id = 17;
                         data_id = 0;
                         break;
-                    case "34":
+                    case 34:
                         block_id = 14;
                         data_id = 0;
                         break;
-                    case "35":
+                    case 35:
                         block_id = 15;
                         data_id = 0;
                         break;
@@ -253,6 +253,11 @@ namespace clf
                         block_id = 0;
                         data_id = 0;
                         break;
+                }
+
+
+                if (int.Parse(split[3]) == 2) {
+                    Debug.Log("started with " + split[3] + " and ended with " + block_id + ":" + data_id);
                 }
 
                 objects.block blk = new objects.block();
