@@ -34,6 +34,7 @@ namespace clf
                 axis_x = x;
                 axis_y = y;
             }
+            vector2() = default;
     };
 
     class color32clf
@@ -73,6 +74,8 @@ namespace clf
 
             struct blocks 
             { 
+                public:
+                    vector<objects::block> blockList;
             };
 
             struct visual
@@ -109,10 +112,21 @@ namespace clf
             static segments::blocks blocks;
             static segments::visual visual;
     };
+    
+    vector<string> string_split(string input, char split) 
+    {
+        vector<string> array;
+        input = input.replace(input.begin(), input.end(), ' = ', '%');
+        istringstream ssline(input);
+        string token;
+        while(getline(ssline, token, split)) {
+            array.push_back(token);
+        }
+        return array;
+    }
 
     class clfUtils 
     {
-        
         public:
             static clfFile loadClfFromFile(string path)
             {
@@ -226,10 +240,53 @@ namespace clf
                                 cout << "found background" << endl;
                                 if(file.visual.bgType == "solid")
                                 {
-                                    
+                                    vector<string> split = string_split(line[1], ';');
+                                    file.visual.colour1 = color32clf(stoi(split[0]), stoi(split[1]), stoi(split[2]), 255);
+                                }
+                                if(file.visual.bgType == "gradient")
+                                {
+                                    vector<string> split = string_split(line[1], ';');
+                                    vector<string> c1 = string_split(split[0], ',');
+                                    vector<string> c2 = string_split(split[1], ',');
+                                    file.visual.colour1 = color32clf(stoi(c1[0]), stoi(c1[1]), stoi(c1[2]), 255);
+                                    file.visual.colour2 = color32clf(stoi(c2[0]), stoi(c2[1]), stoi(c2[2]), 255);
+                                }
+                                if(file.visual.bgType == "image")
+                                {
+                                    file.visual.bgType == "solid";
+                                    file.visual.colour1 = color32clf(255, 0, 0, 255);
                                 }
                             }
                         }
+                    }
+
+                    vector<string> blocks = getSection("Blocks", data);
+
+                    file.blocks = segments::blocks();
+                    objects::block arrayBl[blocks.size()] = {};
+                    for(int i = 0; i < blocks.size(); i++)
+                    {
+                        vector<string> split = string_split(blocks[i], ',');
+
+                        file.blocks.blockList[i].block_id = stoi(string_split(split[0], ':')[0]);
+                        file.blocks.blockList[i].data_id = stoi(string_split(split[0], ':')[1]);
+
+                        file.blocks.blockList[i].position = vector3(stof(split[1]), stof(split[2]), stof(split[3]));
+                        file.blocks.blockList[i].scale = vector2(stof(split[4]), stof(split[5]));
+                        file.blocks.blockList[i].rotation = stof(split[6]);
+
+                        int8_t a = 255;
+
+                        if(!split[7].empty())
+                        {
+                            a = (int8_t) stof(split[7]);
+                        }
+
+                        split[9] = split[9].replace(split[9].begin(), split[9].end(), ';', '\0');
+
+                        file.blocks.blockList[i].colour = color32clf((int8_t) stof(split[7]), (int8_t) stof(split[8]), (int8_t) stof(split[9]), a);
+
+                        return file;
                     }
                 }
             }
