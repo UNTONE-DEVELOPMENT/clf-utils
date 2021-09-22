@@ -71,7 +71,8 @@ namespace clf
 
 
                 string[] maps = getSection("Maps", data);
-                string[] allMaps = maps[1].Split(',');
+                Debug.Log("attempting to split " + maps[0]);
+                string[] allMaps = readCmpLine(maps[0])[1].Split(',');
                 file.maps = allMaps;
 
                 return file;
