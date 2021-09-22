@@ -7,6 +7,88 @@ using UnityEngine;
 
 namespace clf
 {
+    namespace cmp
+    {
+        public struct cmpFile
+        {
+            public string folderPath;
+            public int netId;
+            public string name;
+            public string description;
+            public string longDescription;
+            public string creator;
+            public string mapper;
+            public string backgroundPath;
+            public int soundtrackId;
+            public string[] maps;
+        }
+
+        public static class cmpUtils
+        {
+            public static cmpFile loadCmpFromFile(string path)
+            {
+                return loadCmp(File.ReadAllLines(path), path);
+            }
+
+            public static cmpFile loadCmp(string[] data, string path)
+            {
+                cmpFile file = new cmpFile();
+                string[] general = getSection("General", data);
+                foreach(string x in general)
+                {
+                    string[] line = readCmpLine(x);
+                    switch (line[0])
+                    {
+                        case "id":
+                            file.netId = int.Parse(line[1]);
+                            break;
+                        case "name":
+                            file.name = line[1];
+                            break;
+                        case "description":
+                            file.description = line[1];
+                            break;
+                        case "longDescription":
+                            file.longDescription = line[1];
+                            break;
+                        case "creator":
+                            file.creator = line[1];
+                            break;
+                        case "mapper":
+                            file.mapper = line[1];
+                            break;
+                        case "background":
+                            file.backgroundPath = line[1];
+                            break;
+                        case "soundtrack":
+                            file.soundtrackId = int.Parse(line[1]);
+                            break;
+                        default:
+                            break;
+                    }   
+                }
+                file.folderPath = path.Substring(0, path.LastIndexOf("/") + 1);
+
+
+                string[] maps = getSection("Maps", data);
+                string[] allMaps = maps[1].Split(',');
+                file.maps = allMaps;
+
+                return file;
+            }
+
+            public static string[] readCmpLine(string x)
+            {
+                return clfUtils.readClfLine(x); // can reuse
+            }
+
+            public static string[] getSection(string section, string[] data)
+            {
+                return clfUtils.getSection(section, data); // we can reuse the clf func here
+            }
+        }
+    }
+
     public class segments
     {
         public class general
