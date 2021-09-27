@@ -32,6 +32,8 @@ namespace clf
 
             public static cmpFile loadCmp(string[] data, string path)
             {
+                System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
                 cmpFile file = new cmpFile();
                 string[] general = getSection("General", data);
                 foreach(string x in general)
@@ -205,6 +207,8 @@ namespace clf
 
         public static clfFile convertLegacy(string[] clf)
         {
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
             Debug.Log("starting conversion...");
 
             var watch = new System.Diagnostics.Stopwatch();
@@ -395,6 +399,8 @@ namespace clf
 
         public static clfFile loadClfFromString(string[] data)
         {
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
             clfFile file = newClfFile();
 
             if (data[0].StartsWith("CLF 2"))
