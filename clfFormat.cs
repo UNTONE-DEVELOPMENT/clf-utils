@@ -3,8 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
-using UnityEngine;
+using osuTK;
+using osu.Framework.Logging;
+using osu.Framework.Graphics.Textures;
 
+#pragma warning disable IDE1006 // Naming Styles
 namespace clf
 {
     namespace cmp
@@ -73,7 +76,7 @@ namespace clf
 
 
                 string[] maps = getSection("Maps", data);
-                Debug.Log("attempting to split " + maps[0]);
+                Logger.Log("attempting to split " + maps[0]);
                 string[] allMaps = readCmpLine(maps[0])[1].Split(',');
                 file.maps = allMaps;
 
@@ -121,7 +124,7 @@ namespace clf
             public string bgType;
             public Color32 colour1; // used in solid & as first colour in gradient
             public Color32 colour2; // second colour in gradient
-            public Texture2D sprite;
+            public Texture sprite;
         }
     }
 
@@ -168,18 +171,18 @@ namespace clf
 
     public static class clfUtils
     {
-        public static clfFile newFile()
-        {
-            TextAsset textFile = Resources.Load<TextAsset>("default");
-            Debug.Log(textFile);
-            string[] fLines = Regex.Split(textFile.text, "\n|\r|\r\n");
-            Debug.Log(fLines[0]);
-            return loadClfFromString(fLines);
-        }
+        //public static clfFile newFile()
+        //{
+        //    TextAsset textFile = Resources.Load<TextAsset>("default");
+        //    Logger.Log(textFile);
+        //    string[] fLines = Regex.Split(textFile.text, "\n|\r|\r\n");
+        //    Logger.Log(fLines[0]);
+        //    return loadClfFromString(fLines);
+        //}
 
         public static clfFile loadDynamic(string[] clf)
         {
-            Debug.Log(clf[0]);
+            Logger.Log(clf[0]);
             if(clf[0].StartsWith("CLF 0."))
             {
                 return convertLegacy(clf);
@@ -209,7 +212,7 @@ namespace clf
         {
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
-            Debug.Log("starting conversion...");
+            Logger.Log("starting conversion...");
 
             var watch = new System.Diagnostics.Stopwatch();
 
@@ -253,7 +256,7 @@ namespace clf
                     case 1:
                         block_id = 1;
                         data_id = 0;
-                        Debug.Log("just got a key at " + split[0] + ":" + split[1]);
+                        Logger.Log("just got a key at " + split[0] + ":" + split[1]);
                         break;
                     case 2:
                         block_id = 2;
@@ -355,7 +358,7 @@ namespace clf
 
 
                 if (int.Parse(split[3]) == 2) {
-                    Debug.Log("started with " + split[3] + " and ended with " + block_id + ":" + data_id);
+                    Logger.Log("started with " + split[3] + " and ended with " + block_id + ":" + data_id);
                 }
 
                 objects.block blk = new objects.block();
@@ -367,16 +370,16 @@ namespace clf
                 blk.colour = new Color32(255, 255, 255, 255);
 
                 file.blocks.blockList[i] = blk;
-                //Debug.LogError("Legacy loading currnetly disabled.");
+                //Logger.LogError("Legacy loading currnetly disabled.");
             }
 
             file.visual.bgType = "gradient";
             file.visual.colour1 = new Color32(63, 183, 147, 255);
             file.visual.colour2 = new Color32(46, 89, 101, 255);
 
-            Debug.Log("Conversion Finished");
+            Logger.Log("Conversion Finished");
 
-            Debug.Log("Converted : Execution Time: " + watch.ElapsedMilliseconds + " ms");
+            Logger.Log("Converted : Execution Time: " + watch.ElapsedMilliseconds + " ms");
 
             return file;
         }
@@ -437,19 +440,19 @@ namespace clf
                 }
                 catch
                 {
-                    Debug.Log("Visual section does not exist. Creating.");
+                    Logger.Log("Visual section does not exist. Creating.");
                 }
 
                 if(visualExists == false || visual.Length < 1)
                 {
                     file.visual.bgType = "gradient";
                     file.visual.colour1 = new Color32(63, 183, 147, 255);
-                    Debug.Log("no visual section. creating");
+                    Logger.Log("no visual section. creating");
                     file.visual.colour2 = new Color32(46, 89, 101, 255);
                 }
                 else
                 {
-                    Debug.Log("visualesection found! reading.");
+                    Logger.Log("visualesection found! reading.");
                     foreach(string x in visual)
                     {
                         string[] line = readClfLine(x);
@@ -459,7 +462,7 @@ namespace clf
                         }
                         if (line[0] == "background")
                         {
-                            Debug.Log("found background");
+                            Logger.Log("found background");
                             if(file.visual.bgType == "solid")
                             {
                                 string[] split = line[1].Split(',');
@@ -473,7 +476,7 @@ namespace clf
                                 string[] c2 = split[1].Split(',');
 
                                 file.visual.colour1 = new Color32(byte.Parse(c1[0]), byte.Parse(c1[1]), byte.Parse(c1[2]), 255);
-                                Debug.Log("color 1 : " + file.visual.colour1.ToString());
+                                Logger.Log("color 1 : " + file.visual.colour1.ToString());
                                 file.visual.colour2 = new Color32(byte.Parse(c2[0]), byte.Parse(c2[1]), byte.Parse(c2[2]), 255);
                             }
                             if(file.visual.bgType == "image")
@@ -522,7 +525,7 @@ namespace clf
             }
             else
             {
-                Debug.LogError("[CLF UTILS] <loadClfFromString> Requested string is not CLF 2.x! You should use clfUtils.convertLegacy() instead.");
+                Logger.Error(null, "[CLF UTILS] <loadClfFromString> Requested string is not CLF 2.X!", "You should use clfUtils.convertLegacy() instead.");
                 return null;
             }
         }
@@ -612,8 +615,8 @@ background = " + backgroundString + @"
                 // this is shit
 
                 clf += blk.block_id + ":" + blk.data_id + ","
-                    + blk.position.x + "," + blk.position.y + "," + blk.position.z + ","
-                    + blk.scale.x + "," + blk.scale.y + ","
+                    + blk.position.X + "," + blk.position.Y + "," + blk.position.Z + ","
+                    + blk.scale.X + "," + blk.scale.Y + ","
                     + blk.rotation + "," +
                     blk.colour.r + "," +
                     blk.colour.g + "," +
@@ -624,3 +627,4 @@ background = " + backgroundString + @"
         }
     }
 }
+#pragma warning restore IDE1006 // Naming Styles
