@@ -170,10 +170,40 @@ namespace clf
     {
         public static clfFile newFile()
         {
-            TextAsset textFile = Resources.Load<TextAsset>("default");
-            Debug.Log(textFile);
-            string[] fLines = Regex.Split(textFile.text, "\n|\r|\r\n");
-            Debug.Log(fLines[0]);
+            string fileText = @"CLF 2.0
+
+
+[General]
+name = untitled
+description = 
+creator = 
+tags = 
+
+[Visual]
+bgType = gradient
+background = 0,128,229;247,237,217
+
+[Blocks]
+0:0,-3,1,0,1,1,0,0,0,0,0;
+0:0,-2,1,0,1,1,0,0,0,0,0;
+0:0,-1,1,0,1,1,0,0,0,0,0;
+0:0,0,1,0,1,1,0,0,0,0,0;
+0:0,-2,2,0,1,1,0,0,0,0,0;
+0:0,-1,2,0,1,1,0,0,0,0,0;
+0:0,0,2,0,1,1,0,0,0,0,0;
+0:0,1,1,0,1,1,0,0,0,0,0;
+0:0,4,1,0,1,1,0,0,0,0,0;
+0:0,5,1,0,1,1,0,0,0,0,0;
+0:0,6,1,0,1,1,0,0,0,0,0;
+0:0,7,1,0,1,1,0,0,0,0,0;
+0:0,5,2,0,1,1,0,0,0,0,0;
+0:0,6,2,0,1,1,0,0,0,0,0;
+0:0,7,2,0,1,1,0,0,0,0,0;
+0:0,8,1,0,1,1,0,0,0,0,0;
+1:0,-1,3,0,1,1,0,0,0,0,0;
+3:0,6,3,0,1,1,0,0,0,0,0;
+";
+            string[] fLines = Regex.Split(fileText, "\n|\r|\r\n");
             return loadClfFromString(fLines);
         }
 
