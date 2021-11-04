@@ -264,6 +264,7 @@ background = 0,128,229;247,237,217
             string[] blocks = getSection("LEVEL", clf);
             file.blocks = new segments.blocks();
             file.blocks.blockList = new objects.block[blocks.Length];
+            int i2 = 0;
 
             for (int i = 0; i < blocks.Length; i++)
             {
@@ -273,6 +274,8 @@ background = 0,128,229;247,237,217
 
                 int block_id;
                 int data_id;
+
+
 
                 switch (int.Parse(split[3])) 
                 {
@@ -396,7 +399,27 @@ background = 0,128,229;247,237,217
                 blk.scale = new Vector2(1, 1);
                 blk.colour = new Color32(255, 255, 255, 255);
 
-                file.blocks.blockList[i] = blk;
+                file.blocks.blockList[i2] = blk;
+                i2++;
+
+                if(split[3] == "33")
+                {
+                    Debug.Log("doing an extra block :D");
+
+                    objects.block blk_extra = new objects.block();
+
+                    blk_extra.block_id = 0;
+                    blk_extra.data_id = 0;
+                    blk_extra.position = blk.position;
+                    blk_extra.scale = blk.scale;
+                    blk_extra.colour = blk.colour;
+
+                    file.blocks.blockList[i2] = blk_extra;
+                    i2++;
+                    Array.Resize(ref file.blocks.blockList, file.blocks.blockList.Length + 1);
+                    //file.blocks.blockList
+                }
+
                 //Debug.LogError("Legacy loading currnetly disabled.");
             }
 
