@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ namespace clf
 {
     namespace cmp
     {
+        [System.Serializable]
         public struct cmpFile
         {
             public string folderPath;
@@ -94,6 +96,7 @@ namespace clf
 
     public class segments
     {
+        [System.Serializable]
         public class general
         {
             public string name;
@@ -111,11 +114,13 @@ namespace clf
         }
 
         // BLOCKID,XPOS,YPOS,ZPOS,XSCALE,YSCALE,ROTATION,RED,GREEN,BLUE...
+        [System.Serializable]
         public struct blocks
         {
             public objects.block[] blockList;
         }
 
+        [System.Serializable]
         public struct visual
         {
             public string bgType;
@@ -157,6 +162,7 @@ namespace clf
         // }
     }
 
+    [System.Serializable]
     public class clfFile
     {
         public string path;
@@ -582,9 +588,8 @@ background = 0,128,229;247,237,217
 
         public static string[] readClfLine(string line)
         {
-            line = line.Replace(" = ", "%");
-            char split = '%';
-            string[] splitted = line.Split(split);
+            //Debug.Log("splitting line " + line);
+            string[] splitted = line.Split(" = ");
             return splitted;
         }
 
@@ -674,6 +679,51 @@ background = " + backgroundString + @"
             }
 
             return clf;
+        }
+
+        public static clfFile loadLimited(string[] clf)
+        {
+            clfFile file = newClfFile();
+
+            string[] general = getSection("General", clf);
+            foreach (string x in general)
+            {
+                Debug.Log(x);
+                string[] line = readClfLine(x);
+                if (line[0] == "name")
+                {
+                    file.general.name = line[1];
+                }
+                if (line[0] == "description")
+                {
+                    file.general.description = line[1];
+                }
+                if (line[0] == "creator")
+                {
+                    file.general.creator = line[1];
+                }
+                if (line[0] == "tags")
+                {
+                    file.general.tags = line[1];
+                }
+            }
+
+
+            return file;
+        }
+        
+        public static clfFile loadLimitedFromFile(string path)
+        {
+            if (File.Exists(path))
+            {
+                string[] first10Lines = File.ReadLines(path).Take(10).ToArray<string>();
+                return loadLimited(first10Lines);
+            }
+            else
+            {
+                Debug.LogError("Could not find CLF file for " + path);
+                return null;
+            }
         }
     }
 }
