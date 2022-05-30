@@ -10,6 +10,7 @@ namespace clf
 {
     namespace cmp
     {
+        [System.Serializable]
         public struct cmpFile
         {
             public string folderPath;
@@ -95,6 +96,7 @@ namespace clf
 
     public class segments
     {
+        [System.Serializable]
         public class general
         {
             public string name;
@@ -112,11 +114,13 @@ namespace clf
         }
 
         // BLOCKID,XPOS,YPOS,ZPOS,XSCALE,YSCALE,ROTATION,RED,GREEN,BLUE...
+        [System.Serializable]
         public struct blocks
         {
             public objects.block[] blockList;
         }
 
+        [System.Serializable]
         public struct visual
         {
             public string bgType;
@@ -158,6 +162,7 @@ namespace clf
         // }
     }
 
+    [System.Serializable]
     public class clfFile
     {
         public string path;
