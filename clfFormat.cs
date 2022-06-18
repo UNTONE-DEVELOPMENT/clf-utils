@@ -27,6 +27,53 @@ namespace clf
 
         public static class cmpUtils
         {
+            public static cmpFile initCmp()
+            {
+                cmpFile file = new cmpFile();
+                file.folderPath = "-1 unknown"; // do NOT change this directly. saveCmpFIle() changes it for you
+                file.netId = -1;
+                file.name = "New Mappack";
+                file.description = "";
+                file.longDescription = "";
+                file.creator = "";
+                file.mapper = "";
+                file.backgroundPath = "";
+                file.soundtrackId = 0;
+                file.maps = new string[0];
+                return file;
+            }
+
+            public static string BaseSave(cmpFile file)
+            {
+                string content = "";
+                content += "CMP 1.0\n\n";
+                content += "[General]\n";
+                // general content
+                content += "id = " + file.netId + "\n";
+                content += "name = " + file.name + "\n";
+                content += "description = " + file.description + "\n";
+                content += "longDescription = " + file.longDescription + "\n";
+                content += "creator = " + file.creator + "\n";
+                content += "mapper = " + file.mapper + "\n";
+                content += "background = " + file.backgroundPath + "\n";
+                content += "sountrack = " + file.soundtrackId + "\n";
+                content += "\n[Maps]\n";
+                // maps content//
+                content += "maps = " + String.Join(",", file.maps);
+                return content;
+            }
+
+            // this needs to be done in cubey itself, can't be here, needs to pull cubey variables
+            // public static cmpFile saveMappack(cmpFile file)
+            // {
+            //     string old_location = file.folderPath;
+            //     file.folderPath = file.netId + " " + file.name;
+            // 
+            // 
+            // 
+            //     return file;
+            // }
+
             public static cmpFile loadCmpFromFile(string path)
             {
                 return loadCmp(File.ReadAllLines(path), path);
