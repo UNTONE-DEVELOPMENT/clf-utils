@@ -584,7 +584,8 @@ background = 0,128,229;247,237,217
         public static string[] readClfLine(string line)
         {
             //Debug.Log("splitting line " + line);
-            string[] splitted = line.Split(" = ");
+            line = line.Replace(" = ", "=");
+            string[] splitted = line.Split('=');
             return splitted;
         }
 
